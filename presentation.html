@@ -21,25 +21,215 @@
 
 class: center, middle
 
-# Title
+# SOLID
 
 ---
 
-# Agenda
+# SOLID
 
-1. Introduction
-2. Deep-dive
-3. ...
+<dl>
+  <dt>SOLID</dt>
+  <dd>Single Responsibility Principle</dt>
+  <dd>Open-Closed</dd>
+  <dd>Liskov Substitution</dd>
+  <dd>Dependency Inversion</dd>
 
 ---
 
-# Introduction
+# Single Responsibilty Principle - Curly's Law
+<dl>
+ <dt>OAOO</dt>
+ <dd>Once And Only Once</dd><br>
+ <dt>Stepdown Rule</dt>
+ <dd>Reading Code from Top to Bottom.<dd>
+ <dd> It is the key to keeping functions short and making sure they do “one thing.”</dd><br>
+ <dt>DRY</dt>
+ <dd>Don't Repeat Yourself</dd><br>
+ <dt>SSOT</dt>
+ <dd>Single Source Of Truth</dd><br>
+</dl>
+
+```
+Bad:
+  var numbers = new [] { 5,8,4,3,1 };
+  numbers = numbers.OrderBy(i => i)
+Good:
+  var numbers = new [] { 5,8,4,3,1 };
+  var orderedNumbers = numbers.OrderBy(i => i);
+```
+
+---
+
+# Open Closed Principle(OCP)
+
+should be open for extension, but closed for modification that is, such
+an entity can allow its behaviour to be extended without modifying its source
+code. The name open/closed principle has been used in two ways. Both ways use
+generalizations (for instance, inheritance or delegate functions) to resolve
+the apparent dilemma, but the goals, techniques, and results are different.
+
+## Meyer's Principle
+
+* A module will be said to be open if it is still available for extension. For
+example, it should be possible to add fields to the data structures it contains,
+or new elements to the set of functions it performs.
+* A module will be said to be closed if [it] is available for use by other
+modules. This assumes that the module has been given a well-defined, stable
+description (the interface in the sense of information hiding).
+* A class is closed, since it may be compiled, stored in a library, baselined
+ and used by client classes. But it is also open, since any new class may use
+ it as parent, adding new features. When a descendant class is defined, there
+  is no need to change the original or to disturb its clients
+
+---
+
+## Today - Protected Variations
+In contrast to Meyer's usage, this definition advocates inheritance from
+abstract base classes. Interface specifications can be reused through
+inheritance but implementation need not be. The existing interface is closed
+to modifications and new implementations must, at a minimum, implement that
+interface.
+
+---
+# Liskov Substitution Principle - Principle Of Substitutability, Part1
+
+![Some text](pics/UmlGrafischeselementRechteckEllipseText.jpg)
+
+---
+
+# Liskov Substitution Principle - Principle Of Substitutability, Part2
+
+
+It states that a program that uses objects of a base class T must also
+function correctly with objects of the derived class S without changing the
+program.
+With regard to individual methods, the Liskov substitution principle means that
+when a method is overwritten by a derived class, the prerequisites required by
+the base class for the overwritten method may only be weakened by the
+overwriting and the subsequent conditions guaranteed by the base class for the
+overwritten method may only be strengthened by the overwriting.
+
+---
+# Interface Segregation Prinzip
+
+Accordingly, interfaces that are too large should be divided into several interfaces
+if implementing classes need to have unnecessary methods. After
+successful application of this design principle, a module which includes a
+interface, implement only those methods that use it.
+really needs.<br>
+
+---
+
+# Dependency Inversion Principle - DIP
+![DipAbhaengigkeit.png](pics/DipAbhaengigkeit.png)
+.left[
+- Higher level modules should not depend on lower level modules.
+- Both should depend on abstractions.
+- Abstractions should not depend on details.
+- Details should depend on abstractions.
+]
+
+???
+https://de.wikipedia.org/wiki/Dependency-Inversion-Prinzip
+
+---
+
+##### Bad Example
+```
+public class Lampe {
+   private boolean leuchtet;
+
+   public void anschalten() {
+      leuchtet = true;
+   }
+
+   public void ausschalten() {
+      leuchtet = false;
+   }
+}
+
+public class Schalter {
+   private Lampe lampe;
+   private boolean gedrueckt;
+
+   public Schalter(Lampe lampe) {
+      this.lampe = lampe;
+   }
+
+   public void drueckeSchalter() {
+      gedrueckt = !gedrueckt;
+      if(gedrueckt) {
+         lampe.anschalten();
+      } else {
+         lampe.ausschalten();
+      }
+   }
+}
+```
+
+---
+
+# The Problem
+Switch controls the course of the behavior and uses lamp for it.
+Therefore it should belong to a higher level module. However, the described
+model violates the DIP, since switch is dependent on lamp. If it is decided
+that the methods will be renamed from lamp, switches must also be changed.
+
+The basic problem is that switches work directly with lamp, which belongs to a
+lower module. Switch should define how the object it works with should look.
+
+# The Solution ->
+
+---
+
+```
+public interface SchalterClient {
+   public void anschalten();
+   public void ausschalten();
+}
+
+public class Lampe implements SchalterClient {
+   private boolean leuchtet;
+
+   public void anschalten() {
+      leuchtet = true;
+   }
+
+   public void ausschalten() {
+      leuchtet = false;
+   }
+}
+
+public class Schalter {
+   private SchalterClient client;
+   private boolean gedrueckt;
+
+   public Schalter(Schalterclient client) {
+      this.client = client;
+   }
+
+   public void drueckeSchalter() {
+      gedrueckt = !gedrueckt;
+      if(gedrueckt) {
+         client.anschalten();
+      } else {
+         client.ausschalten();
+      }
+   }
+}
+```
+
+---
+
 
     </textarea>
     <script src="scripts/remark-latest.min.js">
     </script>
     <script>
-      var slideshow = remark.create();
+      var slideshow = remark.create({
+        highlightLanguage: 'java',
+        highlightStyle: 'monokai'
+      });
     </script>
     <script src="./scripts/mermaid.min.js"></script>
     <script>mermaid.initialize({startOnLoad:true});</script>
